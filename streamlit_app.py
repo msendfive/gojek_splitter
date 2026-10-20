@@ -16,7 +16,54 @@ import streamlit as st
 import gojek_edit as ge
 import gojek_split as gs
 
-st.set_page_config(page_title="Gojek Splitter", page_icon="🧾", layout="wide")
+st.set_page_config(page_title="Gojek Splitter", page_icon="🧾", layout="wide", initial_sidebar_state="collapsed")
+
+# --- UI/UX: clean, simple, responsive visual system ---
+st.markdown("""
+<style>
+  :root { --ink:#172033; --muted:#64748b; --line:#e5eaf1; --brand:#087f5b; --brand-dark:#066649; --surface:#ffffff; --canvas:#f6f8fb; }
+  .stApp { background:var(--canvas); color:var(--ink); }
+  .block-container { max-width: 1440px; padding-top: 2rem; padding-bottom: 3rem; }
+  header[data-testid="stHeader"] { background:transparent; }
+  h1,h2,h3 { color:var(--ink); letter-spacing:-.025em; }
+  h1 { font-size:2.15rem !important; font-weight:750 !important; margin-bottom:.2rem !important; }
+  h2 { font-size:1.35rem !important; font-weight:700 !important; }
+  h3 { font-size:1.05rem !important; font-weight:700 !important; }
+  [data-testid="stCaptionContainer"] { color:var(--muted); }
+  .hero { background:linear-gradient(120deg,#ffffff 0%,#f0faf6 100%); border:1px solid #dcefe7; border-radius:18px; padding:1.35rem 1.5rem; margin-bottom:1.25rem; }
+  .hero-kicker { color:var(--brand); font-size:.76rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; margin-bottom:.45rem; }
+  .hero-title { color:var(--ink); font-size:1.8rem; font-weight:800; letter-spacing:-.04em; line-height:1.2; }
+  .hero-copy { color:#586579; font-size:.96rem; margin-top:.45rem; max-width:780px; line-height:1.6; }
+  .step-row { display:flex; gap:.55rem; flex-wrap:wrap; margin:.75rem 0 1.25rem; }
+  .step-chip { background:#fff; color:#5e6b7e; border:1px solid var(--line); border-radius:999px; padding:.45rem .8rem; font-size:.82rem; font-weight:650; }
+  .step-chip.active { background:#e6f6ef; color:#066649; border-color:#b9e6d2; }
+  div[data-testid="stFileUploader"] { background:#fff; border:1px dashed #b8c8d5; border-radius:14px; padding:1rem; }
+  div[data-testid="stFileUploader"] section { border:0; }
+  div[data-testid="stFileUploader"] button { border-radius:9px; }
+  div[data-testid="stMetric"] { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:1rem 1.05rem; box-shadow:0 2px 7px rgba(15,23,42,.025); }
+  div[data-testid="stMetricLabel"] { color:var(--muted); font-size:.82rem; }
+  div[data-testid="stMetricValue"] { color:var(--ink); font-size:1.35rem; font-weight:750; }
+  div[data-testid="stAlert"] { border-radius:12px; }
+  div[data-testid="stExpander"] { background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  div[data-testid="stExpander"] details summary { font-weight:650; }
+  .section-intro { color:var(--muted); font-size:.9rem; margin-top:-.55rem; margin-bottom:.9rem; }
+  div[data-testid="stDataFrame"], div[data-testid="stDataEditor"] { border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .stButton button, .stDownloadButton button { border-radius:10px; font-weight:650; min-height:2.6rem; }
+  .stButton button[kind="primary"], .stDownloadButton button[kind="primary"] { background:var(--brand); border-color:var(--brand); }
+  .stButton button[kind="primary"]:hover, .stDownloadButton button[kind="primary"]:hover { background:var(--brand-dark); border-color:var(--brand-dark); }
+  div[data-baseweb="select"] > div, div[data-baseweb="input"] > div { border-radius:9px; }
+  hr { border-color:var(--line); }
+  @media (max-width: 768px) {
+    .block-container { padding:1rem .8rem 2rem; }
+    h1 { font-size:1.7rem !important; }
+    .hero { padding:1rem; border-radius:14px; }
+    .hero-title { font-size:1.45rem; }
+    div[data-testid="stMetric"] { padding:.8rem; }
+    div[data-testid="stMetricValue"] { font-size:1.1rem; }
+  }
+</style>
+""", unsafe_allow_html=True)
+
 
 DEFAULT_ON = {"gofood", "gosend"}
 
@@ -26,8 +73,19 @@ def parse(pdf_bytes: bytes):
     return gs.parse_pdf(io.BytesIO(pdf_bytes))
 
 
-st.title("🧾 Gojek Splitter")
-st.caption("Pisahkan riwayat transaksi Gojek per layanan, periksa dan sesuaikan datanya, lalu unduh laporan PDF/Excel.")
+st.markdown("""
+<div class="hero">
+  <div class="hero-kicker">Pengelolaan laporan transaksi</div>
+  <div class="hero-title">Gojek Splitter</div>
+  <div class="hero-copy">Pisahkan transaksi berdasarkan layanan, periksa data dengan mudah, lalu unduh laporan yang siap digunakan. File diproses di memori aplikasi.</div>
+</div>
+<div class="step-row">
+  <span class="step-chip active">1 · Unggah PDF</span>
+  <span class="step-chip">2 · Periksa data</span>
+  <span class="step-chip">3 · Pilih layanan</span>
+  <span class="step-chip">4 · Unduh laporan</span>
+</div>
+""", unsafe_allow_html=True)
 
 with st.expander("Catatan penggunaan", expanded=False):
     st.markdown(
@@ -40,9 +98,11 @@ with st.expander("Catatan penggunaan", expanded=False):
         "- Hasil adalah PDF buatan ulang, **bukan dokumen resmi Gojek**. Untuk audit/klaim, gunakan bukti satuan dari aplikasi Gojek."
     )
 
-up = st.file_uploader("Unggah PDF riwayat transaksi Gojek", type=["pdf"])
+st.markdown("### 1. Unggah riwayat transaksi")
+st.markdown('<div class="section-intro">Pilih file PDF riwayat transaksi yang diunduh dari aplikasi Gojek.</div>', unsafe_allow_html=True)
+up = st.file_uploader("Pilih file PDF", type=["pdf"], help="Format yang didukung: PDF riwayat transaksi Gojek.")
 if up is None:
-    st.info("Silakan unggah file PDF untuk memulai.")
+    st.info("Unggah PDF untuk mulai memeriksa dan memisahkan transaksi.")
     st.stop()
 
 raw = up.getvalue()
@@ -73,9 +133,9 @@ with st.expander("Data akun & periode (bisa diedit)", expanded=False):
 info_changed = any(info[k] != info0.get(k, "") for k in ("nama", "telp", "email", "periode"))
 
 # --- editor CRUD ---
-st.subheader("Data transaksi")
+st.markdown("### 2. Periksa dan sesuaikan transaksi")
 cc1, cc2 = st.columns([5, 1])
-cc1.caption("Edit langsung di tabel. Baris baru, hapus, dan ubah nilai akan tercatat di log perubahan.")
+cc1.markdown('<div class="section-intro">Klik sel untuk mengedit. Gunakan baris kosong di bagian bawah tabel untuk menambah transaksi.</div>', unsafe_allow_html=True)
 if cc2.button("↺ Reset ke data asli", width="stretch"):
     st.session_state["ver"] += 1
     st.rerun()
@@ -156,7 +216,9 @@ groups = OrderedDict()
 for r in recs:
     groups.setdefault(r["layanan"], []).append(r)
 
-st.subheader("Pilih layanan")
+st.markdown("---")
+st.markdown("### 3. Pilih layanan untuk laporan")
+st.markdown('<div class="section-intro">Pilih satu atau beberapa layanan. Setiap layanan akan dibuatkan file PDF tersendiri.</div>', unsafe_allow_html=True)
 chosen = st.multiselect(
     "Layanan yang dibuat laporannya", options=list(groups.keys()),
     default=[l for l in groups if l.lower() in DEFAULT_ON],
@@ -180,11 +242,13 @@ for lay in chosen:
 if not log.empty:
     files[f"Log_perubahan_{suffix or 'hasil'}.csv"] = log.to_csv(index=False).encode("utf-8-sig")
 
-st.subheader("Unduh hasil")
+st.markdown("---")
+st.markdown("### 4. Unduh laporan")
+st.markdown('<div class="section-intro">Unduh file satu per satu atau gunakan ZIP untuk mengambil semua hasil sekaligus.</div>', unsafe_allow_html=True)
 MIME = {".pdf": "application/pdf", ".csv": "text/csv",
         ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
 for fname, data in files.items():
-    st.download_button(f"⬇️ {fname}", data=data, file_name=fname,
+    st.download_button(f"Unduh {fname}", data=data, file_name=fname,
                        mime=MIME[fname[fname.rfind('.'):]], key=fname)
 
 if len(files) > 1:
