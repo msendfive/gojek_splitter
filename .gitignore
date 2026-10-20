@@ -1,0 +1,6 @@
+# Jangan pernah commit data transaksi
+*.pdf
+*.xlsx
+*.zip
+__pycache__/
+.venv/
